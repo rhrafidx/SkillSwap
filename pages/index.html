@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillSwap — Trade a Skill, Learn a Skill</title>
+<meta name="description" content="SkillSwap matches you with people who teach what you want to learn and want to learn what you teach. No money, just know-how.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Preloader -->
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="preloader__ring"></div>
+</div>
+
+<!-- ======================= NAVBAR ======================= -->
+<header class="navbar" id="navbar">
+  <div class="container navbar__inner">
+    <a href="index.html" class="brand">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2">
+          <path d="M4 9c3-5 10-5 13 0" stroke-linecap="round"/>
+          <path d="M20 15c-3 5-10 5-13 0" stroke-linecap="round"/>
+          <path d="M15 6l2 3-3 1" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 18l-2-3 3-1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>Skill<strong>Swap</strong></span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <div class="navbar__actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a href="login.html" class="btn btn--ghost btn--sm">Log in</a>
+      <a href="register.html" class="btn btn--gradient btn--sm">Sign up</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="mobile-drawer" id="mobileDrawer">
+  <a href="index.html">Home</a>
+  <a href="marketplace.html">Marketplace</a>
+  <a href="dashboard.html">Dashboard</a>
+  <a href="about.html">About</a>
+  <a href="contact.html">Contact</a>
+  <hr>
+  <a href="login.html" class="btn btn--outline btn--block">Log in</a>
+  <a href="register.html" class="btn btn--gradient btn--block">Sign up</a>
+</aside>
+
+<main>
+  <!-- ======================= HERO ======================= -->
+  <section class="hero">
+    <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
+    <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
+
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <span class="eyebrow reveal">No money. Just know-how.</span>
+        <h1 class="hero__title reveal">Teach what you know. <span class="text-gradient">Learn what you don't.</span></h1>
+        <p class="hero__subtitle reveal">SkillSwap connects you with people nearby who want exactly what you offer — and offer exactly what you want. Every lesson is traded, not paid for.</p>
+
+        <form class="search-bar reveal" id="searchForm" role="search">
+          <svg class="search-bar__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Try “Spanish”, “guitar”, “Figma”…" aria-label="Search for a skill">
+          <select id="searchCategory" aria-label="Filter by category">
+            <option value="">Any category</option>
+            <option value="music">Music</option>
+            <option value="tech">Tech &amp; Code</option>
+            <option value="design">Design</option>
+            <option value="language">Languages</option>
+            <option value="fitness">Wellness</option>
+          </select>
+          <button type="submit" class="btn btn--gradient">Find a swap</button>
+        </form>
+
+        <div class="hero__trust reveal">
+          <div class="avatar-stack" aria-hidden="true">
+            <img src="https://i.pravatar.cc/72?img=32" alt="">
+            <img src="https://i.pravatar.cc/72?img=47" alt="">
+            <img src="https://i.pravatar.cc/72?img=15" alt="">
+            <img src="https://i.pravatar.cc/72?img=5" alt="">
+          </div>
+          <p><strong>9,400+</strong> skill swaps completed this month</p>
+        </div>
+      </div>
+
+      <div class="hero__visual" id="heroVisual">
+        <div class="orbit" id="orbit">
+          <div class="orbit__ring orbit__ring--1"></div>
+          <div class="orbit__ring orbit__ring--2"></div>
+          <div class="orbit__core" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2">
+              <path d="M4 8h13l-3-3M20 16H7l3 3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="orbit__chip" style="--i:0">🎸 Guitar</span>
+          <span class="orbit__chip" style="--i:1">🗣️ Spanish</span>
+          <span class="orbit__chip" style="--i:2">💻 Code</span>
+          <span class="orbit__chip" style="--i:3">🎨 Design</span>
+
+          <div class="match-card">
+            <div class="match-card__row">
+              <img src="https://i.pravatar.cc/72?img=32" alt="">
+              <div>
+                <strong>Maya R.</strong>
+                <div class="rating">★★★★★ <span>4.9</span></div>
+              </div>
+            </div>
+            <div class="match-card__swap">
+              <span class="tag tag--teach">Teaches Guitar</span>
+              <span class="tag tag--learn">Wants Spanish</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-cue" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- ======================= POPULAR SKILLS ======================= -->
+  <section class="section" id="popular">
+    <div class="container">
+      <div class="section__head reveal">
+        <div>
+          <span class="eyebrow">Right now</span>
+          <h2>Popular skills this week</h2>
+        </div>
+        <div class="scroll-controls">
+          <button class="scroll-btn" id="popPrev" aria-label="Scroll left">‹</button>
+          <button class="scroll-btn" id="popNext" aria-label="Scroll right">›</button>
+        </div>
+      </div>
+
+      <div class="chip-row reveal" id="popularSkills">
+        <div class="skill-pill">🎨 Digital Illustration<span>412 teachers</span></div>
+        <div class="skill-pill">🧑‍🍳 Home Cooking<span>241 teachers</span></div>
+        <div class="skill-pill">💻 Web Development<span>836 teachers</span></div>
+        <div class="skill-pill">🧘 Yoga &amp; Breathwork<span>378 teachers</span></div>
+        <div class="skill-pill">🎹 Piano<span>203 teachers</span></div>
+        <div class="skill-pill">📈 Excel &amp; Finance<span>296 teachers</span></div>
+        <div class="skill-pill">🗣️ Public Speaking<span>167 teachers</span></div>
+        <div class="skill-pill">📷 Photography<span>329 teachers</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= CATEGORIES ======================= -->
+  <section class="section section--tint" id="categories">
+    <div class="container">
+      <div class="section__head section__head--center reveal">
+        <span class="eyebrow">Explore</span>
+        <h2>Find your category</h2>
+        <p class="section__desc">Eight ways into the swap — pick where your curiosity lives.</p>
+      </div>
+
+      <div class="grid grid--categories">
+        <a href="marketplace.html?cat=music" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#4F6EF7;--c2:#8B5CF6">🎵</span>
+          <h3>Music</h3><p>412 teachers</p>
+        </a>
+        <a href="marketplace.html?cat=tech" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#8B5CF6;--c2:#C084FC">💻</span>
+          <h3>Tech &amp; Code</h3><p>836 teachers</p>
+        </a>
+        <a href="marketplace.html?cat=design" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#C084FC;--c2:#4F6EF7">🎨</span>
+          <h3>Design</h3><p>519 teachers</p>
+        </a>
+        <a href="marketplace.html?cat=language" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#4F6EF7;--c2:#22C55E">🗣️</span>
+          <h3>Languages</h3><p>1,204 teachers</p>
+        </a>
+        <a href="marketplace.html?cat=fitness" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#22C55E;--c2:#8B5CF6">🧘</span>
+          <h3>Wellness</h3><p>378 teachers</p>
+        </a>
+        <a href="marketplace.html?cat=business" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#F59E0B;--c2:#8B5CF6">📈</span>
+          <h3>Business</h3><p>296 teachers</p>
+        </a>
+        <a href="marketplace.html?cat=cooking" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#F59E0B;--c2:#4F6EF7">🍳</span>
+          <h3>Cooking</h3><p>241 teachers</p>
+        </a>
+        <a href="marketplace.html?cat=crafts" class="category-card reveal">
+          <span class="category-card__icon" style="--c1:#C084FC;--c2:#22C55E">✂️</span>
+          <h3>Crafts</h3><p>187 teachers</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= FEATURED MEMBERS ======================= -->
+  <section class="section" id="featured">
+    <div class="container">
+      <div class="section__head reveal">
+        <div>
+          <span class="eyebrow">Meet the community</span>
+          <h2>Featured swappers</h2>
+        </div>
+        <a href="marketplace.html" class="link-arrow">See everyone →</a>
+      </div>
+
+      <div class="grid grid--members">
+        <article class="member-card reveal">
+          <div class="member-card__cover"></div>
+          <img class="member-card__avatar" src="https://i.pravatar.cc/120?img=32" alt="Diego Larsson">
+          <h3>Diego Larsson</h3>
+          <p class="member-card__role">Spanish Tutor · Stockholm</p>
+          <div class="rating">★★★★★ <span>4.9 (128)</span></div>
+          <div class="member-card__tags">
+            <span class="tag tag--teach">Spanish</span>
+            <span class="tag tag--learn">Guitar</span>
+          </div>
+          <a href="profile.html" class="btn btn--outline btn--sm btn--block">View profile</a>
+        </article>
+
+        <article class="member-card reveal">
+          <div class="member-card__cover"></div>
+          <img class="member-card__avatar" src="https://i.pravatar.cc/120?img=47" alt="Amara Reyes">
+          <h3>Amara Reyes</h3>
+          <p class="member-card__role">Product Designer · Manila</p>
+          <div class="rating">★★★★★ <span>5.0 (94)</span></div>
+          <div class="member-card__tags">
+            <span class="tag tag--teach">UI/UX</span>
+            <span class="tag tag--learn">Copywriting</span>
+          </div>
+          <a href="profile.html" class="btn btn--outline btn--sm btn--block">View profile</a>
+        </article>
+
+        <article class="member-card reveal">
+          <div class="member-card__cover"></div>
+          <img class="member-card__avatar" src="https://i.pravatar.cc/120?img=15" alt="Kenji Mori">
+          <h3>Kenji Mori</h3>
+          <p class="member-card__role">Full-Stack Dev · Osaka</p>
+          <div class="rating">★★★★☆ <span>4.7 (61)</span></div>
+          <div class="member-card__tags">
+            <span class="tag tag--teach">JavaScript</span>
+            <span class="tag tag--learn">Photography</span>
+          </div>
+          <a href="profile.html" class="btn btn--outline btn--sm btn--block">View profile</a>
+        </article>
+
+        <article class="member-card reveal">
+          <div class="member-card__cover"></div>
+          <img class="member-card__avatar" src="https://i.pravatar.cc/120?img=5" alt="Priya Nair">
+          <h3>Priya Nair</h3>
+          <p class="member-card__role">Yoga Instructor · Bengaluru</p>
+          <div class="rating">★★★★★ <span>4.8 (152)</span></div>
+          <div class="member-card__tags">
+            <span class="tag tag--teach">Yoga</span>
+            <span class="tag tag--learn">Video Editing</span>
+          </div>
+          <a href="profile.html" class="btn btn--outline btn--sm btn--block">View profile</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= HOW IT WORKS ======================= -->
+  <section class="section section--tint" id="how">
+    <div class="container">
+      <div class="section__head section__head--center reveal">
+        <span class="eyebrow">The process</span>
+        <h2>How a swap actually happens</h2>
+        <p class="section__desc">Three steps. No invoice, ever.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <span class="step__num">01</span>
+          <h3>List what you know</h3>
+          <p>Add a skill you can teach and one you're hoping to learn — takes about two minutes.</p>
+        </div>
+        <div class="step reveal">
+          <span class="step__num">02</span>
+          <h3>Get matched</h3>
+          <p>SkillSwap surfaces people whose "wants" line up with your "offers," and vice versa.</p>
+        </div>
+        <div class="step reveal">
+          <span class="step__num">03</span>
+          <h3>Trade sessions</h3>
+          <p>Message, agree on a time, and meet — in person or on a call. Rate each other after.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= TESTIMONIALS ======================= -->
+  <section class="section" id="testimonials">
+    <div class="container container--narrow">
+      <div class="section__head section__head--center reveal">
+        <span class="eyebrow">Voices from the swap</span>
+        <h2>People are trading more than time</h2>
+      </div>
+
+      <div class="testimonial-slider reveal">
+        <div class="testimonial-track" id="testiTrack">
+          <blockquote class="testimonial">
+            <p>“I taught someone conversational French and walked away with a working knowledge of Python. Fair trade doesn't get better than that.”</p>
+            <footer>
+              <img src="https://i.pravatar.cc/92?img=45" alt="">
+              <div><strong>Camille Laurent</strong><span>Language Coach, Lyon</span></div>
+            </footer>
+          </blockquote>
+          <blockquote class="testimonial">
+            <p>“I was freelancing alone and stuck. Swapping design feedback for bookkeeping help every week changed how I run my business.”</p>
+            <footer>
+              <img src="https://i.pravatar.cc/92?img=51" alt="">
+              <div><strong>Tunde Okafor</strong><span>Illustrator, Lagos</span></div>
+            </footer>
+          </blockquote>
+          <blockquote class="testimonial">
+            <p>“No awkward invoices, no 'friends and family' rate arguments. Just two people helping each other get better.”</p>
+            <footer>
+              <img src="https://i.pravatar.cc/92?img=25" alt="">
+              <div><strong>Sana Haider</strong><span>Pianist, Karachi</span></div>
+            </footer>
+          </blockquote>
+        </div>
+        <div class="testimonial-dots" id="testiDots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= FAQ ======================= -->
+  <section class="section section--tint" id="faq">
+    <div class="container container--narrow">
+      <div class="section__head section__head--center reveal">
+        <span class="eyebrow">Questions</span>
+        <h2>Frequently asked</h2>
+      </div>
+
+      <div class="accordion reveal">
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="true">
+            Is SkillSwap really free?
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="accordion__panel" style="max-height:200px">
+            <p>Yes. There's no cash exchanged between members — the platform runs on a barter model. We may introduce an optional premium tier for extra visibility later, but core swapping stays free.</p>
+          </div>
+        </div>
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">
+            How are swap partners matched?
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="accordion__panel">
+            <p>You list what you can teach and what you want to learn. Our matching engine looks for people whose wants and offers overlap with yours, then ranks by rating, location, and availability.</p>
+          </div>
+        </div>
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">
+            What if a swap doesn't go well?
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="accordion__panel">
+            <p>Every session ends with a two-way rating. If something feels off, report it from the chat or your dashboard and our team will step in.</p>
+          </div>
+        </div>
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">
+            Can I teach more than one skill?
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="accordion__panel">
+            <p>Absolutely. Add as many "offered" and "wanted" skills as you like from your profile — the more you list, the more matches you'll see.</p>
+          </div>
+        </div>
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false">
+            Online or in person?
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="accordion__panel">
+            <p>Whichever both people agree on. Use the built-in chat to arrange a video call or a local meetup — SkillSwap doesn't restrict either.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= CTA BAND ======================= -->
+  <section class="cta-band">
+    <div class="container cta-band__inner reveal">
+      <h2>Got a skill worth sharing?</h2>
+      <p>Join thousands trading knowledge instead of invoices.</p>
+      <a href="register.html" class="btn btn--light btn--lg">Create your free account</a>
+    </div>
+  </section>
+</main>
+
+<!-- ======================= FOOTER ======================= -->
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <span class="brand">Skill<strong>Swap</strong></span>
+      <p>Trade a skill you have for one you want. No money, just know-how.</p>
+      <div class="socials" aria-label="Social links">
+        <a href="#" aria-label="Twitter">𝕏</a>
+        <a href="#" aria-label="Instagram">◎</a>
+        <a href="#" aria-label="LinkedIn">in</a>
+      </div>
+    </div>
+
+    <div class="footer__col">
+      <h4>Product</h4>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="footer__col">
+      <h4>Company</h4>
+      <a href="about.html">About us</a>
+      <a href="contact.html">Contact</a>
+      <a href="#">Careers</a>
+      <a href="#">Blog</a>
+    </div>
+    <div class="footer__col">
+      <h4>Stay in the loop</h4>
+      <p>Occasional emails about new categories and features.</p>
+      <form class="newsletter" onsubmit="event.preventDefault(); this.reset();">
+        <input type="email" placeholder="you@email.com" aria-label="Email address" required>
+        <button type="submit" class="btn btn--gradient btn--sm">Join</button>
+      </form>
+    </div>
+  </div>
+  <div class="container footer__bottom">
+    <p>© 2026 SkillSwap. All rights reserved.</p>
+    <div>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Guidelines</a>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script src="script.js"></script>
+</body>
+</html>
