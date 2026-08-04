@@ -1,0 +1,92 @@
+// Prisma schema — defines the database tables and how they relate.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// A registered person.
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String // stored as a bcrypt hash, never plain text
+  bio       String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  skills            Skill[] // skills this user offers
+  sentExchanges     Exchange[] @relation("SentExchanges")
+  receivedExchanges Exchange[] @relation("ReceivedExchanges")
+  sentMessages      Message[]  @relation("SentMessages")
+  receivedMessages  Message[]  @relation("ReceivedMessages")
+}
+
+// A skill someone offers to teach/trade.
+model Skill {
+  id          String   @id @default(uuid())
+  title       String
+  category    String
+  description String
+  rating      Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Who offers this skill
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  exchanges Exchange[]
+}
+
+// A request from one user to trade for a skill offered by another user.
+model Exchange {
+  id         String   @id @default(uuid())
+  offerSkill String // what the requester offers in return
+  message    String?
+  status     String   @default("pending") // pending | accepted | declined
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // The skill being requested
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  // Who sent the request
+  requesterId String
+  requester   User   @relation("SentExchanges", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  // Who owns the requested skill (receives the request)
+  ownerId String
+  owner   User   @relation("ReceivedExchanges", fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+// A single chat message between two users.
+model Message {
+  id        String   @id @default(uuid())
+  body      String
+  createdAt DateTime @default(now())
+
+  senderId String
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId String
+  receiver   User   @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+// A message submitted through the public "Contact us" form.
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  body      String
+  createdAt DateTime @default(now())
+}

@@ -217,16 +217,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!emailValid || !passwordValid) return;
 
-      // Front-end only: simulate an API call. Replace with a real fetch() to your backend, e.g.:
-      // const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'},
-      //   body: JSON.stringify({ email: emailField.value, password: passwordField.value }) });
+      // Real API call to the backend. On success we store the token + user
+      // (via SkillSwapAPI) so the logged-in pages stay authenticated.
       submitBtn.classList.add('is-loading');
-      setTimeout(() => {
-        submitBtn.classList.remove('is-loading');
-        note.textContent = 'Logged in successfully — redirecting to your dashboard…';
-        note.classList.add('is-success');
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
-      }, 1200);
+      SkillSwapAPI.login(emailField.value.trim(), passwordField.value)
+        .then(({ token, user }) => {
+          SkillSwapAPI.auth.save(token, user);
+          note.textContent = 'Logged in successfully — redirecting to your dashboard…';
+          note.classList.add('is-success');
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+        })
+        .catch((err) => {
+          note.textContent = err.message;
+          note.classList.add('is-error');
+        })
+        .finally(() => submitBtn.classList.remove('is-loading'));
     });
   }
 
@@ -293,16 +298,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Front-end only: simulate an API call. Replace with a real fetch() to your backend, e.g.:
-      // const res = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'},
-      //   body: JSON.stringify({ name: nameField.value, email: emailField.value, password: passwordField.value }) });
+      // Real API call to the backend. On success the user is registered and
+      // logged in (token + user stored), then redirected to the dashboard.
       submitBtn.classList.add('is-loading');
-      setTimeout(() => {
-        submitBtn.classList.remove('is-loading');
-        note.textContent = 'Account created — welcome to SkillSwap! Redirecting…';
-        note.classList.add('is-success');
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
-      }, 1200);
+      SkillSwapAPI.register(nameField.value.trim(), emailField.value.trim(), passwordField.value)
+        .then(({ token, user }) => {
+          SkillSwapAPI.auth.save(token, user);
+          note.textContent = 'Account created — welcome to SkillSwap! Redirecting…';
+          note.classList.add('is-success');
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+        })
+        .catch((err) => {
+          note.textContent = err.message;
+          note.classList.add('is-error');
+        })
+        .finally(() => submitBtn.classList.remove('is-loading'));
     });
   }
 
@@ -479,18 +489,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('exchangeSubmit');
     const note = document.getElementById('exchangeNote');
 
-    // Front-end only: simulate an API call. Replace with a real fetch() to your backend, e.g.:
-    // await fetch('/api/exchanges', { method:'POST', headers:{'Content-Type':'application/json'},
-    //   body: JSON.stringify({ skillId, offerSkill: offerSkill.value, message: exchangeMessage.value }) });
-    submitBtn.classList.add('is-loading');
     note.textContent = '';
     note.className = 'form-note';
-    setTimeout(() => {
-      submitBtn.classList.remove('is-loading');
-      note.textContent = 'Request sent! Marco usually replies within a few hours.';
-      note.classList.add('is-success');
-      setTimeout(closeModal, 1400);
-    }, 1200);
+
+    // Must be logged in to request an exchange.
+    if (!SkillSwapAPI.auth.isLoggedIn()) {
+      note.textContent = 'Please log in first to request an exchange.';
+      note.classList.add('is-error');
+      return;
+    }
+
+    // The skill id comes from the page. Set data-skill-id on the modal's
+    // form (or read it from the URL ?id=). Falls back to the URL param.
+    const skillId = exchangeForm.dataset.skillId ||
+      new URLSearchParams(location.search).get('id');
+    const offerSkill = document.getElementById('offerSkill')?.value.trim() || '';
+    const message = document.getElementById('exchangeMessage')?.value.trim() || '';
+
+    submitBtn.classList.add('is-loading');
+    SkillSwapAPI.createExchange({ skillId, offerSkill, message })
+      .then(() => {
+        note.textContent = 'Request sent! You’ll hear back soon.';
+        note.classList.add('is-success');
+        setTimeout(closeModal, 1400);
+      })
+      .catch((err) => {
+        note.textContent = err.message;
+        note.classList.add('is-error');
+      })
+      .finally(() => submitBtn.classList.remove('is-loading'));
   });
 
   /* ---------- Chat UI ---------- */
@@ -871,16 +898,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Front-end only: simulate an API call. Replace with a real fetch() to your backend, e.g.:
-      // await fetch('/api/contact', { method:'POST', headers:{'Content-Type':'application/json'},
-      //   body: JSON.stringify({ name: nameField.value, email: emailField.value, subject: subjectField.value, message: messageField.value }) });
+      // Real API call to the backend contact endpoint.
       submitBtn.classList.add('is-loading');
-      setTimeout(() => {
-        submitBtn.classList.remove('is-loading');
-        note.textContent = "Message sent! We'll get back to you within one business day.";
-        note.classList.add('is-success');
-        contactForm.reset();
-      }, 1200);
+      SkillSwapAPI.sendContact({
+        name: nameField.value.trim(),
+        email: emailField.value.trim(),
+        subject: subjectField.value.trim(),
+        message: messageField.value.trim(),
+      })
+        .then(() => {
+          note.textContent = "Message sent! We'll get back to you within one business day.";
+          note.classList.add('is-success');
+          contactForm.reset();
+        })
+        .catch((err) => {
+          note.textContent = err.message;
+          note.classList.add('is-error');
+        })
+        .finally(() => submitBtn.classList.remove('is-loading'));
     });
   }
 
