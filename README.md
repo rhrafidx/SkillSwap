@@ -1,113 +1,204 @@
-# SkillSwap
+# SkillSwap — Backend API
 
-A peer-to-peer marketplace where people trade skills instead of money — teach what you know, learn what you don't.
+A simple, modular Node.js + Express REST API for SkillSwap, using **PostgreSQL** and **Prisma**.
 
-This repo is currently a **front-end design prototype**: static HTML/CSS/JS with simulated interactions (fake API delays, mock data). No backend is connected yet.
-
----
-
-## Tech stack
-
-- Plain **HTML5**
-- Plain **CSS3** (custom properties / design tokens, no framework, no preprocessor)
-- Vanilla **JavaScript** (no build step, no dependencies)
-- Google Fonts (Poppins)
-
-No npm, no bundler — just open the files in a browser.
+Each feature (auth, skills, exchanges, messages, contact) lives in its own folder with the same three files — `routes → controller → service` — so it's easy to find things and add new features.
 
 ---
 
-## Project structure
+## Contents
+
+1. [Folder structure](#folder-structure)
+2. [Get a PostgreSQL URL from Render](#1-get-a-postgresql-url-from-render)
+3. [Run the backend locally](#2-run-the-backend-locally)
+4. [Run the frontend locally](#3-run-the-frontend-locally)
+5. [Deploy the backend to Render](#4-deploy-the-backend-to-render)
+6. [Deploy the frontend to Render](#5-deploy-the-frontend-to-render)
+7. [API endpoints](#api-endpoints)
+
+---
+
+## Folder structure
 
 ```
-skillswap/
-├── index.html            Homepage / marketing landing page
-├── about.html             About / mission / team
-├── contact.html            Contact form + FAQ
-├── login.html               Log in
-├── register.html            Sign up
-├── marketplace.html         Browse & filter skills
-├── skill-details.html        Single skill listing + request-exchange modal
-├── dashboard.html           Logged-in home (stats, activity, recommendations)
-├── chat.html                Messaging / conversations
-├── notifications.html        Notification center
-├── profile.html               User profile
-├── settings.html             Account settings (incl. delete account modal)
-├── style.css                 All styles (design tokens + components)
-└── script.js                 All interactivity (shared across pages)
+server/
+├── prisma/
+│   ├── schema.prisma          Database models
+│   ├── migrations/            SQL that creates the tables
+│   └── seed.js                Optional demo data
+├── src/
+│   ├── index.js               Starts the server
+│   ├── app.js                 Builds the Express app (CORS, JSON, routes, errors)
+│   ├── routes.js              Combines all feature routes under /api
+│   ├── config/                env + shared Prisma client
+│   ├── middleware/            auth check + error handler
+│   ├── utils/                 small helpers (JWT, async, errors)
+│   └── modules/               auth · skills · exchanges · messages · contact
+└── .env.example               Copy to .env and fill in
 ```
-
-Pages fall into two layouts:
-- **Public / marketing pages** (`index`, `about`, `contact`, `login`, `register`) — top navbar + footer.
-- **Logged-in app pages** (`dashboard`, `marketplace`, `chat`, `profile`, `settings`, `notifications`, `skill-details`) — left sidebar shell.
-
-`style.css` and `script.js` are shared by every page — there is only one of each for the whole site.
 
 ---
 
-## Running it locally
+## 1. Get a PostgreSQL URL from Render
 
-This is a static site, so any local server works. From the project folder:
+You only need to do this once. Render gives you a free managed PostgreSQL database.
+
+1. Go to **https://dashboard.render.com** and sign in (or sign up — it's free).
+2. Click **New +** (top right) → **Postgres**.
+3. Give it a **Name** (e.g. `skillswap-db`), pick a **Region** close to you, and choose the **Free** instance type.
+4. Click **Create Database** and wait a minute until its status is **Available**.
+5. Open the database and scroll to the **Connections** section. You'll see two URLs:
+   - **Internal Database URL** — use this for the backend once it's *also* deployed on Render (same region).
+   - **External Database URL** — use this to connect from **your own computer** (local development and running migrations).
+6. Copy the **External Database URL**. It looks like:
+   ```
+   postgresql://skillswap_user:somepassword@dpg-xxxxx.oregon-postgres.render.com/skillswap_db
+   ```
+
+> **Prisma + Render tip:** External connections to Render require SSL. Add `?sslmode=require` to the end of the URL, e.g.
+> `postgresql://...render.com/skillswap_db?sslmode=require`
+
+---
+
+## 2. Run the backend locally
+
+From the `server/` folder:
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Create your .env file
+#    Windows (Command Prompt):  copy .env.example .env
+#    Mac/Linux:                 cp .env.example .env
+```
+
+Open `.env` and paste your Render **External Database URL** into `DATABASE_URL`,
+and change `JWT_SECRET` to any long random string:
+
+```
+DATABASE_URL="postgresql://...render.com/skillswap_db?sslmode=require"
+JWT_SECRET="some-long-random-string"
+```
+
+Then create the tables and start the server:
+
+```bash
+# 3. Create the database tables
+npx prisma migrate dev --name init
+
+# 4. (optional) Add demo data — login: aisha@example.com / password123
+npm run db:seed
+
+# 5. Start the server (auto-reloads on changes)
+npm run dev
+```
+
+You should see `🚀 SkillSwap API running at http://localhost:4000`.
+Check it: open **http://localhost:4000/api/health** → `{"status":"ok"}`.
+
+---
+
+## 3. Run the frontend locally
+
+The frontend is plain static HTML/CSS/JS (in the project root, one level up from `server/`). Any static server works. From the **project root**:
 
 ```bash
 # Python
-python3 -m http.server 8000
+python -m http.server 8000
 
-# Node
+# or Node
 npx serve .
 ```
 
-Then open `http://localhost:8000/index.html`.
+Then open **http://localhost:8000/pages/index.html**.
 
-> ⚠️ **Known issue:** every page currently links to `../assets/css/style.css` and `../assets/js/script.js`, which assumes an `assets/css/` and `assets/js/` folder one level up from the HTML files. As uploaded, `style.css` and `script.js` sit flat alongside the HTML. Either:
-> - move `style.css` → `assets/css/style.css` and `script.js` → `assets/js/script.js`, with the HTML files one level up, **or**
-> - update the `<link>`/`<script>` paths in every HTML file to `style.css` / `script.js`.
->
-> Nothing will render styled/interactive until this is fixed.
+While running locally, `assets/js/api.js` automatically talks to
+`http://localhost:4000/api`, so as long as the backend (step 2) is running,
+login, register, the exchange form, and the contact form all work for real.
 
 ---
 
-## Design system
+## 4. Deploy the backend to Render
 
-Defined at the top of `style.css` as CSS custom properties:
+1. Push this project to a GitHub repository.
+2. In the Render dashboard: **New +** → **Web Service** → connect your repo.
+3. Configure it:
+   - **Root Directory:** `server`
+   - **Runtime:** Node
+   - **Build Command:** `npm install && npx prisma generate && npx prisma migrate deploy`
+   - **Start Command:** `npm start`
+   - **Region:** the same one as your database.
+4. Under **Environment**, add these variables:
 
-- **Brand gradient**: blue → violet → lilac (`--primary`, `--secondary`, `--accent`)
-- **Light/dark theme**: toggled via `[data-theme="dark"]` on `<html>`, persisted with the theme toggle button (`#themeToggle`) present on every page
-- **Radii, shadows, spacing, transitions**: all tokenized (`--radius-sm/md/lg/pill`, `--shadow-sm/md/lg`, `--transition`)
-- **Font**: Poppins, loaded via Google Fonts
+   | Key | Value |
+   |-----|-------|
+   | `DATABASE_URL` | your Render **Internal Database URL** (from step 1) |
+   | `JWT_SECRET` | a long random string |
+   | `CORS_ORIGIN` | your frontend URL (fill in after step 5), e.g. `https://skillswap-web.onrender.com` |
 
-Responsive breakpoints: 640 / 760 / 860 / 960 / 1024px, plus a `prefers-reduced-motion` query for accessibility.
+   > `PORT` is set automatically by Render — you don't need to add it.
+
+5. Click **Create Web Service**. When it finishes, your API is live at something like
+   `https://skillswap-api.onrender.com`. Test `…/api/health`.
+
+> If `prisma migrate deploy` ever fails, you can switch the Build Command to use
+> `npx prisma db push` instead — it creates the tables directly from the schema.
 
 ---
 
-## Known issues / open items
+## 5. Deploy the frontend to Render
 
-These were flagged during review and intentionally left for after the design phase:
+1. In the Render dashboard: **New +** → **Static Site** → connect the same repo.
+2. Configure it:
+   - **Root Directory:** leave blank (project root)
+   - **Build Command:** leave blank (nothing to build)
+   - **Publish Directory:** `.`
+3. Click **Create Static Site**. It deploys at something like
+   `https://skillswap-web.onrender.com` (open `/pages/index.html`).
+4. **Point the frontend at your live API:** open `assets/js/api.js`, set
+   `PROD_API_BASE` to your backend URL, and push the change:
+   ```js
+   const PROD_API_BASE = 'https://skillswap-api.onrender.com';
+   ```
+5. **Allow the frontend in CORS:** back on the backend web service, set the
+   `CORS_ORIGIN` env var to your static site URL (from step 3) and let it redeploy.
 
-| # | Issue | Where |
-|---|---|---|
-| 1 | Asset paths (`../assets/...`) don't match the flat file structure | all pages |
-| 2 | Homepage hero search passes `?q=` / `?category=` to the marketplace, but the marketplace page never reads those query params to pre-filter results | `index.html` → `marketplace.html` |
-| 3 | Top nav is inconsistent between pages — `index.html` lists "Dashboard" as a plain link mid-list; `about.html`/`contact.html` move it to the end with a `nav-links__soon` ("coming soon") style | `index.html`, `about.html`, `contact.html` |
-| 4 | Footer newsletter form submit handling differs slightly between pages (`preventDefault()+reset()` vs `return false`) | footer, various pages |
+That's it — the deployed frontend now talks to the deployed backend.
 
 ---
 
-## Backend integration checklist (not started)
+## API endpoints
 
-Everything below is currently mocked with `setTimeout()` and hardcoded HTML — flagged in `script.js` with comments at each relevant spot. To connect a real backend:
+All routes are prefixed with `/api`. Protected routes (✔) need an
+`Authorization: Bearer <token>` header — you get the token from login/register.
 
-1. Fix the asset-path issue above first.
-2. Design the API contract (e.g. `GET /api/skills`, `POST /api/exchanges`, `GET /api/messages/:id`, auth endpoints).
-3. Build a shared `fetch` wrapper (base URL, auth headers, error handling).
-4. Convert static/hardcoded sections to data-driven rendering — start with the marketplace grid or dashboard stats, since they're the most self-contained.
-5. Add real authentication (token/session storage) and guard the logged-in pages (`dashboard`, `chat`, `profile`, `settings`, `notifications` currently have no login check).
-6. Wire up forms (login, register, contact, settings) to real endpoints — these are the closest to done, since validation and loading/success/error states are already built.
+| Method | Path | Auth | What it does |
+|--------|------|------|--------------|
+| GET  | `/health` | — | Health check |
+| POST | `/auth/register` | — | Create an account, returns `{ user, token }` |
+| POST | `/auth/login` | — | Log in, returns `{ user, token }` |
+| GET  | `/auth/me` | ✔ | Current logged-in user |
+| GET  | `/skills` | — | List skills. Supports `?q=` and `?category=` |
+| GET  | `/skills/:id` | — | One skill |
+| POST | `/skills` | ✔ | Create a skill |
+| POST | `/exchanges` | ✔ | Request an exchange for a skill |
+| GET  | `/exchanges/sent` | ✔ | Requests you sent |
+| GET  | `/exchanges/received` | ✔ | Requests others sent you |
+| PATCH| `/exchanges/:id/status` | ✔ | Accept / decline a request |
+| GET  | `/messages` | ✔ | Your conversation list |
+| GET  | `/messages/:userId` | ✔ | Full chat with one user |
+| POST | `/messages` | ✔ | Send a message |
+| POST | `/contact` | — | Submit the contact form |
 
 ---
 
 ## Notes
 
-- All avatars/photos use `pravatar.cc` placeholder images — swap for real assets before launch.
-- No automated tests exist yet (none were in scope for this design phase).
-- No accessibility audit tool has been run beyond manual checks (alt text present on all images, `aria-label`/`aria-expanded` on interactive controls, reduced-motion support).
+- Passwords are hashed with bcrypt — plain passwords are never stored.
+- CORS is open (`*`) by default for easy local development; set `CORS_ORIGIN`
+  to your frontend URL in production.
+- Render's Free database and web service can sleep/expire — fine for testing,
+  upgrade for anything real.
+- `test-e2e.js` is a small smoke test that boots the app and hits every
+  endpoint. Run it against a test database with `node test-e2e.js`.
