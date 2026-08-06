@@ -101,6 +101,23 @@ Check it: open **http://localhost:4000/api/health** → `{"status":"ok"}`.
 
 ## 3. Run the frontend locally
 
+<<<<<<< HEAD
+The frontend is plain static HTML/CSS/JS (in the project root, one level up from `server/`). Any static server works. From the **project root**:
+
+```bash
+# Python
+python -m http.server 8000
+
+# or Node
+npx serve .
+```
+
+Then open **http://localhost:8000/pages/index.html**.
+
+While running locally, `assets/js/api.js` automatically talks to
+`http://localhost:4000/api`, so as long as the backend (step 2) is running,
+login, register, the exchange form, and the contact form all work for real.
+=======
 The premium frontend now lives in `client/` as a Next.js + JSX app. From the **client** folder:
 
 ```bash
@@ -119,6 +136,7 @@ For verification, run:
 npm test
 npm run build
 ```
+>>>>>>> feature/convert-to-react
 
 ---
 
