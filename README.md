@@ -1,6 +1,6 @@
-# SkillSwap — Backend API
+# SkillSwap — Full-stack app
 
-A simple, modular Node.js + Express REST API for SkillSwap, using **PostgreSQL** and **Prisma**.
+A simple, modular full-stack app for SkillSwap with a Next.js frontend and a Node.js + Express backend, using **PostgreSQL** and **Prisma**.
 
 Each feature (auth, skills, exchanges, messages, contact) lives in its own folder with the same three files — `routes → controller → service` — so it's easy to find things and add new features.
 
@@ -21,8 +21,6 @@ Each feature (auth, skills, exchanges, messages, contact) lives in its own folde
 ## Folder structure
 
 ```
-<<<<<<< HEAD
-=======
 client/
 ├── app/                      Premium Next.js app router experience
 ├── components/               JSX-driven UI sections
@@ -30,7 +28,6 @@ client/
 ├── public/                   Static assets
 └── package.json              Next.js + Jest setup
 
->>>>>>> feature/convert-to-react
 server/
 ├── prisma/
 │   ├── schema.prisma          Database models
@@ -111,24 +108,7 @@ Check it: open **http://localhost:4000/api/health** → `{"status":"ok"}`.
 
 ## 3. Run the frontend locally
 
-<<<<<<< HEAD
-The frontend is plain static HTML/CSS/JS (in the project root, one level up from `server/`). Any static server works. From the **project root**:
-
-```bash
-# Python
-python -m http.server 8000
-
-# or Node
-npx serve .
-```
-
-Then open **http://localhost:8000/pages/index.html**.
-
-While running locally, `assets/js/api.js` automatically talks to
-`http://localhost:4000/api`, so as long as the backend (step 2) is running,
-login, register, the exchange form, and the contact form all work for real.
-=======
-The premium frontend now lives in `client/` as a Next.js + JSX app. From the **client** folder:
+The frontend now lives in `client/` as a Next.js app. From the **client** folder:
 
 ```bash
 npm install
@@ -146,7 +126,6 @@ For verification, run:
 npm test
 npm run build
 ```
->>>>>>> feature/convert-to-react
 
 ---
 
@@ -180,20 +159,19 @@ npm run build
 
 ## 5. Deploy the frontend to Render
 
-1. In the Render dashboard: **New +** → **Static Site** → connect the same repo.
+1. In the Render dashboard: **New +** → **Web Service** → connect the same repo.
 2. Configure it:
-   - **Root Directory:** leave blank (project root)
-   - **Build Command:** leave blank (nothing to build)
-   - **Publish Directory:** `.`
-3. Click **Create Static Site**. It deploys at something like
-   `https://skillswap-web.onrender.com` (open `/pages/index.html`).
-4. **Point the frontend at your live API:** open `assets/js/api.js`, set
-   `PROD_API_BASE` to your backend URL, and push the change:
-   ```js
-   const PROD_API_BASE = 'https://skillswap-api.onrender.com';
-   ```
+   - **Root Directory:** `client`
+   - **Runtime:** Node
+   - **Build Command:** `npm install && npm run build`
+   - **Start Command:** `npm run start`
+   - **Region:** the same one as your backend if possible.
+3. Click **Create Web Service**. It deploys at something like
+   `https://skillswap-web.onrender.com`.
+4. **Point the frontend at your live API:** add this environment variable in the frontend service:
+   - `NEXT_PUBLIC_API_BASE_URL=https://skillswap-api.onrender.com/api`
 5. **Allow the frontend in CORS:** back on the backend web service, set the
-   `CORS_ORIGIN` env var to your static site URL (from step 3) and let it redeploy.
+   `CORS_ORIGIN` env var to your frontend URL and let it redeploy.
 
 That's it — the deployed frontend now talks to the deployed backend.
 
